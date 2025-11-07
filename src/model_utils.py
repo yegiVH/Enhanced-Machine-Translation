@@ -54,20 +54,26 @@ def align_embeddings(X: np.ndarray,
     """
     Learn transformation R that maps English to French space
     by minimizing ||XR - Y||^2 via gradient descent.
+
+    Returns:
+        R: learned transformation matrix
+        losses: list of loss values per iteration
     """
     np.random.seed(129)
     R = np.random.rand(X.shape[1], X.shape[1])
-
+    losses = []
+    
     for i in range(train_steps):
+        current_loss = compute_loss(X, Y, R)
+        losses.append(current_loss)
+        
         if verbose and i % 25 == 0:
-            print(f"Iteration {i} - loss: {compute_loss(X, Y, R):.4f}")
+            print(f"Iteration {i} - loss: {current_loss: .4f}")
+        
         grad = compute_gradient(X, Y, R)
-        R -= learning_rate * grad
-
-    if verbose:
-        print(f"Final loss: {compute_loss(X, Y, R):.4f}")
-
-    return R
+        R -= learning_rate*grad
+        
+    return R, losses
 
 
 def translate_word(english_word: str,
