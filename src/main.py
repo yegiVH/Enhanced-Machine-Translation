@@ -1,9 +1,11 @@
 import pickle
 import os
 import matplotlib.pyplot as plt
+
 from src.data_utils import get_dict, get_matrices
 from src.model_utils import align_embeddings, translate_word
 from src.evaluate import test_vocabulary
+from src.visualize import plot_embedding_alignment
 
 
 def main():
@@ -26,6 +28,7 @@ def main():
                          train_steps=400,
                          learning_rate=0.8,
                          verbose=True)
+    
 
     # Save loss curve
     plt.figure()
@@ -43,7 +46,9 @@ def main():
     acc = test_vocabulary(X_val, Y_val, R)
     print(f"\nAccuracy on test dictionary: {acc:.3f}\n")
     
-    
+    # Visualize alignment on a subset of word pairs
+    plot_embedding_alignment(X_train, Y_train, R, output_path="results/embedding_alignment.png")
+
     # Show a few sample predictions
     print("Sample translations (from test dictionary):")
     sample_items = list(en_fr_test.items())[:10]

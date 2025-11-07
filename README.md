@@ -25,6 +25,28 @@ semantically similar words lie close to each other.
 
 On the current setup, the model reaches about **0.56 accuracy** on the test dictionary.
 
+## Results & Visualizations
+
+The project generates:
+
+- `results/loss_curve.png`: Training loss over iterations.
+- `results/embedding_alignment.png`: PCA visualization showing how English embeddings
+  move closer to their French counterparts after applying the learned transformation.
+
+These plots illustrate that the model is not just memorizing translations, but learning
+a linear mapping between semantic spaces.
+
+## 🧭 Results
+
+Below is a 2D PCA projection showing the effect of the learned alignment:
+
+![Embedding alignment](results/embedding_alignment.png)
+
+The blue points are original English embeddings, the orange crosses are French embeddings,  
+and the green triangles are the English embeddings after transformation.  
+The overlap between green and orange points shows that the model successfully aligned the two languages.
+
+
 ## Project Structure
 
 ```text
