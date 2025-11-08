@@ -99,3 +99,30 @@ def translate_word(english_word: str,
             best_word = fr_word
 
     return best_word
+
+def learn_orthogonal_mapping(X: np.ndarray, Y: np.ndarray) -> np.ndarray:
+    """
+    Learn an orthogonal transformation matrix R that best aligns X to Y
+    in the least squares sense, using the Orthogonal Procrustes solution.
+
+    Solves:
+        R* = argmin_R || X R - Y ||_F
+    subject to:
+        R^T R = I  (R is orthogonal)
+
+    This has a closed-form solution:
+        R = U V^T
+    where:
+        U, Σ, V^T = SVD(X^T Y)
+    """
+    
+    # Compute cross-covariance between X and Y
+    M = X.T @ Y # shape: (d, d)
+    
+    # singular value decomposition
+    U, _, Vt = np.linalg.svd(M)
+    
+    # optimal orthogonal mapping
+    R = U @ Vt # shape: (d, d)
+    
+    return R

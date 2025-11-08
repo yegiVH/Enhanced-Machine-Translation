@@ -1,2 +1,3 @@
-Final loss: 0.5706
-Accuracy on test dictionary: 0.557
+Final loss: N/A (Orthogonal Procrustes closed-form solution)
+Training method: Orthogonal Procrustes (SVD-based)
+Accuracy on test dictionary: 0.614

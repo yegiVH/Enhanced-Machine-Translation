@@ -3,7 +3,7 @@ import os
 import matplotlib.pyplot as plt
 
 from src.data_utils import get_dict, get_matrices
-from src.model_utils import align_embeddings, translate_word
+from src.model_utils import align_embeddings, translate_word, learn_orthogonal_mapping
 from src.evaluate import test_vocabulary
 from src.visualize import plot_embedding_alignment
 
@@ -24,21 +24,31 @@ def main():
     X_train, Y_train = get_matrices(en_fr_train, fr_embeddings, en_embeddings)
 
     # Train mapping
-    R, losses = align_embeddings(X_train, Y_train,
-                         train_steps=400,
-                         learning_rate=0.8,
-                         verbose=True)
+    USE_ORTHOGONAL = True
+    if USE_ORTHOGONAL:
+        print("Learning mapping with Orthogonal Procrusters (closed-form) ...")
+        R = learn_orthogonal_mapping(X_train, Y_train)
+        losses = None
+    else:
+        print("Learning mapping with gradient descent...")
+        R, losses = align_embeddings(X_train, Y_train,
+                            train_steps=400,
+                            learning_rate=0.8,
+                            verbose=True)
     
 
-    # Save loss curve
-    plt.figure()
-    plt.plot(losses)
-    plt.xlabel("Iteration")
-    plt.ylabel("Loss")
-    plt.title("Training Loss for Embedding Alignment")
-    plt.tight_layout()
-    plt.savefig("results/loss_curve.png")
-    plt.close()
+    # Plot loss curve only if we used gradient descent
+    if losses is not None:
+        os.makedirs("results", exist_ok=True)
+        plt.figure()
+        plt.plot(losses)
+        plt.xlabel("Iteration")
+        plt.ylabel("Loss")
+        plt.title("Training Loss for Embedding Alignment")
+        plt.tight_layout()
+        plt.savefig("results/loss_curve.png")
+        plt.close()
+
     
     
     # Evaluate
@@ -59,8 +69,15 @@ def main():
 
     # Save a small report
     with open("results/report.txt", "w", encoding="utf-8") as f:
-        f.write(f"Final loss: {losses[-1]:.4f}\n")
+        if losses is not None:
+            f.write(f"Final loss: {losses[-1]:.4f}\n")
+            f.write("Training method: Gradient descent\n")
+        else:
+            f.write("Final loss: N/A (Orthogonal Procrustes closed-form solution)\n")
+            f.write("Training method: Orthogonal Procrustes (SVD-based)\n")
+
         f.write(f"Accuracy on test dictionary: {acc:.3f}\n")
+
 
     # Demo loop
     while True:
